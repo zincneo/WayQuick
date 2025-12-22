@@ -1,16 +1,16 @@
-use std::sync::mpmc;
+use std::sync::mpsc;
 use std::thread;
 
 enum Event {
     Stop,
 }
 
-struct SystemObserver(mpmc::Sender<Event>);
+struct SystemObserver(mpsc::Sender<Event>);
 
-struct WayQuickExecutor(mpmc::Receiver<Event>);
+struct WayQuickExecutor(mpsc::Receiver<Event>);
 
 pub fn exec() {
-    let (tx, rx) = mpmc::channel::<Event>();
+    let (tx, rx) = mpsc::channel::<Event>();
     let handles = [
         thread::spawn(move || {
             SystemObserver::new(tx).run();
@@ -25,20 +25,23 @@ pub fn exec() {
 }
 
 impl SystemObserver {
-    fn new(sender: mpmc::Sender<Event>) -> Self {
+    fn new(sender: mpsc::Sender<Event>) -> Self {
         Self(sender)
     }
 
     fn run(&self) {
         use std::fs;
-        use std::io::{self, Read};
+        use std::io::Read;
         use std::os::unix::net::UnixListener;
         loop {
             let socket_path = "/tmp/WayQuick.sock";
 
             let _ = fs::remove_file(socket_path);
 
-            let listener = UnixListener::bind(socket_path)?;
+            let Ok(listener) = UnixListener::bind(socket_path) else {
+                eprintln!("Socket binding failed");
+                return;
+            };
 
             println!("Server waiting for connection...");
 
@@ -64,7 +67,7 @@ impl SystemObserver {
 }
 
 impl WayQuickExecutor {
-    fn new(receiver: mpmc::Receiver<Event>) -> Self {
+    fn new(receiver: mpsc::Receiver<Event>) -> Self {
         Self(receiver)
     }
 
