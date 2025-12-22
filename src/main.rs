@@ -4,6 +4,8 @@ mod linux_module;
 #[cfg(target_os = "windows")]
 mod windows_module;
 
+mod launcher;
+
 fn main() {
     #[cfg(target_os = "linux")]
     {

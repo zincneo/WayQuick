@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-gpui = { git = "https://github.com/zed-industries/zed", branch = "main", default-features = false, features = [ "font-kit", "wayland" ] }
+gpui = { git = "https://github.com/zed-industries/zed", branch = "main" }
 
 # Enable more optimization in the release profile at the cost of compile time.
 [profile.release]
