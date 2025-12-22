@@ -1,0 +1,16 @@
+[package]
+name = "gmenu"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+gpui = { git = "https://github.com/zed-industries/zed", branch = "main", default-features = false, features = [ "font-kit", "wayland" ] }
+
+# Enable more optimization in the release profile at the cost of compile time.
+[profile.release]
+codegen-units = 1
+lto = "fat"
+opt-level = "z"
+panic = "abort"
+strip = true
+debug = false
