@@ -1,5 +1,5 @@
 {
-  description = "gpui devShell";
+  description = "WayQuick flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -44,21 +44,21 @@
         # 1. 编译应用
         gmenuUnwrapped = craneLib.buildPackage (commonArgs // {
           inherit cargoArtifacts;
-          pname = "gmenu";
+          pname = "WayQuick";
           version = "0.1.0";
           propagatedBuildInputs = guiLibs;
         });
 
         # 2. 应用编译后需要使用wrapProgram处理动态链接库的路径问题
         gmenu = pkgs.stdenv.mkDerivation {
-          pname = "gmenu";
+          pname = "WayQuick";
           version = "0.1.0";
           src = gmenuUnwrapped;
           buildInputs = [ pkgs.makeWrapper ];
           installPhase = ''
             mkdir -p $out/bin
-            cp ${gmenuUnwrapped}/bin/gmenu $out/bin/gmenu
-            wrapProgram $out/bin/gmenu \
+            cp ${gmenuUnwrapped}/bin/wayquick $out/bin/wayquick
+            wrapProgram $out/bin/wayquick \
               --prefix LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath guiLibs}
           '';
         };

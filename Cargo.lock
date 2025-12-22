@@ -3,6 +3,13 @@
 version = 4
 
 [[package]]
+name = "WayQuick"
+version = "0.1.0"
+dependencies = [
+ "gpui",
+]
+
+[[package]]
 name = "adler2"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1959,13 +1966,6 @@ dependencies = [
  "slotmap",
  "wasm-bindgen",
  "web-sys",
-]
-
-[[package]]
-name = "gmenu"
-version = "0.1.0"
-dependencies = [
- "gpui",
 ]
 
 [[package]]
