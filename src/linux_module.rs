@@ -1,13 +1,8 @@
+use crate::quickapp::Event;
 use std::sync::mpsc;
 use std::thread;
 
-enum Event {
-    Stop,
-}
-
 struct SystemObserver(mpsc::Sender<Event>);
-
-struct WayQuickExecutor(mpsc::Receiver<Event>);
 
 pub fn exec() {
     let (tx, rx) = mpsc::channel::<Event>();
@@ -16,7 +11,7 @@ pub fn exec() {
             SystemObserver::new(tx).run();
         }),
         thread::spawn(move || {
-            WayQuickExecutor::new(rx).run();
+            crate::quickapp::app_run(rx);
         }),
     ];
     for handle in handles {
@@ -64,12 +59,4 @@ impl SystemObserver {
             }
         }
     }
-}
-
-impl WayQuickExecutor {
-    fn new(receiver: mpsc::Receiver<Event>) -> Self {
-        Self(receiver)
-    }
-
-    fn run(&self) {}
 }
