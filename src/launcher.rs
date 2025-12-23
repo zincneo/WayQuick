@@ -31,7 +31,9 @@ pub fn app_run(kind: WindowKind) {
     Application::new().run(|app: &mut App| {
         let bounds = Bounds::centered(None, size(px(400.), px(200.0)), app);
         let window_options = WindowOptions {
+            titlebar: None,
             window_bounds: Some(WindowBounds::Windowed(bounds)),
+            window_decorations: None,
             kind,
             ..Default::default()
         };
