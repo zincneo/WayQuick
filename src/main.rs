@@ -1,19 +1,19 @@
-#[cfg(target_os = "linux")]
-mod linux_module;
+use macro_rules_attribute::apply;
+use smol::channel::unbounded;
+use smol_macros::{Executor, main};
+use way_quick::Event;
 
-mod launcher;
-mod quickapp;
-#[cfg(target_os = "windows")]
-mod windows_module;
+mod app;
 
-fn main() {
-    #[cfg(target_os = "linux")]
-    {
-        linux_module::exec();
-    }
+mod web_server;
 
-    #[cfg(target_os = "windows")]
-    {
-        windows_module::exec();
-    }
+#[apply(main!)]
+async fn main(ex: &Executor<'_>) {
+    let (tx, rx) = unbounded::<Event>();
+    let web_server_task = ex.spawn(web_server::run(tx));
+    let app_task = ex.spawn(app::run(rx));
+
+    app_task.await;
+
+    println!("{:?}", web_server_task.cancel().await);
 }
