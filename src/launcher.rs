@@ -12,8 +12,10 @@ impl Render for RootView {
             .size_full()
             .bg(gpui::white())
             .track_focus(&self.focus_handle)
-            .on_action(|_: &Esc, window, _| {
+            .on_action(|_: &Esc, window, app| {
                 window.remove_window();
+                #[cfg(target_os = "windows")]
+                app.quit();
             })
     }
 }
