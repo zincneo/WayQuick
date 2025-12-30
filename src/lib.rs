@@ -8,9 +8,5 @@ pub enum Event {
     Launcher,
 }
 
-#[derive(Default)]
-pub struct Global {
-    pub launcher: Option<WindowHandle<launcher::RootView>>,
-}
-
-pub static GLOBAL: LazyLock<Mutex<Global>> = LazyLock::new(|| Mutex::default());
+pub static LAUNCHER_WINDOW_HANDLE: LazyLock<Mutex<Option<WindowHandle<launcher::RootView>>>> =
+    LazyLock::new(|| Mutex::default());
