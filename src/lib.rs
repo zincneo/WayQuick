@@ -8,5 +8,7 @@ pub enum Event {
     Launcher,
 }
 
-pub static LAUNCHER_WINDOW_HANDLE: LazyLock<Mutex<Option<WindowHandle<launcher::RootView>>>> =
+type Singleton<T> = LazyLock<Mutex<Option<T>>>;
+
+pub static LAUNCHER_WINDOW_HANDLE: Singleton<WindowHandle<launcher::RootView>> =
     LazyLock::new(|| Mutex::default());
