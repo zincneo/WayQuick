@@ -39,10 +39,13 @@ fn build_root_view(window: &mut Window, app: &mut App) -> Entity<RootView> {
 }
 
 fn get_window_options() -> WindowOptions {
-    let window_bounds = Some(WindowBounds::Windowed(Bounds {
-        origin: Point::new(px(0.), px(0.)),
-        size: size(px(400.), px(200.)),
-    }));
+    let origin = if let Some(origin) = *CENTER_POINTER.lock_blocking() {
+        origin
+    } else {
+        Point::new(px(0.), px(0.))
+    };
+    let size = size(px(800.), px(420.));
+    let window_bounds = Some(WindowBounds::Windowed(Bounds { origin, size }));
     #[cfg(target_os = "linux")]
     let kind = WindowKind::LayerShell(layer_shell::LayerShellOptions {
         layer: layer_shell::Layer::Overlay,

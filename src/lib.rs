@@ -1,4 +1,4 @@
-use gpui::WindowHandle;
+use gpui::{Pixels, Point, WindowHandle};
 use smol::lock::Mutex;
 use std::sync::LazyLock;
 
@@ -12,3 +12,5 @@ type Singleton<T> = LazyLock<Mutex<Option<T>>>;
 
 pub static LAUNCHER_WINDOW_HANDLE: Singleton<WindowHandle<launcher::RootView>> =
     LazyLock::new(|| Mutex::default());
+
+pub static CENTER_POINTER: Singleton<Point<Pixels>> = LazyLock::new(|| Mutex::default());

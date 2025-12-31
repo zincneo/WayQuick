@@ -4,7 +4,10 @@ use way_quick::*;
 pub async fn run(rx: Receiver<Event>) {
     let application = Application::new().with_quit_mode(QuitMode::Explicit);
     application.run(|app| {
+        let bounds = Bounds::centered(None, size(px(800.), px(420.)), app);
+        *CENTER_POINTER.lock_blocking() = Some(bounds.origin);
         app.on_window_closed(on_closed).detach();
+
         let app = app.to_async();
         app.spawn(async move |app| {
             event_handle(app, rx).await;

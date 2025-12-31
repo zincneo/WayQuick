@@ -1,6 +1,7 @@
-use smol::{channel::Sender, io::AsyncReadExt, net, stream::StreamExt};
+use smol::channel::Sender;
+#[cfg(target_os = "linux")]
+use smol::{io::AsyncReadExt, net, stream::StreamExt};
 use way_quick::Event;
-
 pub async fn run(tx: Sender<Event>) -> anyhow::Result<()> {
     #[cfg(target_os = "linux")]
     {
