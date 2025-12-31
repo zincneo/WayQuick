@@ -1,25 +1,55 @@
 use crate::*;
 use gpui::*;
+use gpui_component::{input::InputState, Root, Sizable};
+use gpui_component::input::Input;
+
 pub struct RootView {
     focus_handle: FocusHandle,
+    input: Entity<InputState>,
+}
+
+impl RootView {
+    fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let focus_handle = cx.focus_handle();
+        focus_handle.focus(window, cx);
+        let input = cx.new(|cx| InputState::new(window, cx));
+        input.update(cx, |input, cx| input.focus(window, cx));
+        Self { focus_handle, input }
+    }
 }
 
 actions!(actions_namespace, [Esc]);
 
 impl Render for RootView {
-    fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl gpui::IntoElement {
-        div()
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let sheet_layer = Root::render_sheet_layer(window, cx);
+        let dialog_layer = Root::render_dialog_layer(window, cx);
+        let notification_layer = Root::render_notification_layer(window, cx);
+
+        let mut content = div()
             .size_full()
-            .bg(rgb(0x_24_27_3a))
-            .border(AbsoluteLength::Pixels(px(2.)))
-            .border_color(rgb(0x_b7_bd_f8))
-            .rounded(AbsoluteLength::Pixels(px(12.)))
             .track_focus(&self.focus_handle)
-            .on_action(|_: &Esc, window, app| {
+            .flex()
+            .items_center()
+            .justify_center()
+            .child(Input::new(&self.input).small())
+            .on_action(|_: &Esc, window: &mut Window, _app: &mut App| {
                 window.remove_window();
                 #[cfg(target_os = "windows")]
-                app.quit();
-            })
+                _app.quit();
+            });
+
+        if let Some(layer) = sheet_layer {
+            content = content.child(layer);
+        }
+        if let Some(layer) = dialog_layer {
+            content = content.child(layer);
+        }
+        if let Some(layer) = notification_layer {
+            content = content.child(layer);
+        }
+
+        content
     }
 }
 
@@ -34,11 +64,10 @@ pub async fn start(app: &mut AsyncApp) {
     *launcher_window_handle = Some(window_handle);
 }
 
-fn build_root_view(window: &mut Window, app: &mut App) -> Entity<RootView> {
+fn build_root_view(window: &mut Window, app: &mut App) -> Entity<Root> {
     app.bind_keys([KeyBinding::new("escape", Esc, None)]);
-    let focus_handle = app.focus_handle();
-    focus_handle.focus(window, app);
-    app.new(|_cx| RootView { focus_handle })
+    let launcher_view = app.new(|cx| RootView::new(window, cx));
+    app.new(|cx| Root::new(launcher_view, window, cx))
 }
 
 fn get_window_options() -> WindowOptions {

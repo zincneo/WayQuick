@@ -3,7 +3,8 @@ use smol::channel::Receiver;
 use way_quick::*;
 pub async fn run(rx: Receiver<Event>) {
     let application = Application::new().with_quit_mode(QuitMode::Explicit);
-    application.run(|app| {
+    application.run(move |app| {
+        gpui_component::init(app);
         let bounds = Bounds::centered(None, size(px(800.), px(420.)), app);
         *CENTER_POINTER.lock_blocking() = Some(bounds.origin);
         app.on_window_closed(on_closed).detach();
@@ -35,7 +36,7 @@ fn on_closed(app: &mut App) {
         .iter()
         .filter(|window| {
             window
-                .downcast::<WindowHandle<launcher::RootView>>()
+                .downcast::<WindowHandle<gpui_component::Root>>()
                 .is_none()
         })
         .collect::<Vec<_>>()
