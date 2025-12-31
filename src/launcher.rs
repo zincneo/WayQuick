@@ -10,7 +10,10 @@ impl Render for RootView {
     fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl gpui::IntoElement {
         div()
             .size_full()
-            .bg(gpui::white())
+            .bg(rgb(0x_24_27_3a))
+            .border(AbsoluteLength::Pixels(px(2.)))
+            .border_color(rgb(0x_b7_bd_f8))
+            .rounded(AbsoluteLength::Pixels(px(12.)))
             .track_focus(&self.focus_handle)
             .on_action(|_: &Esc, window, app| {
                 window.remove_window();
@@ -53,7 +56,7 @@ fn get_window_options() -> WindowOptions {
         ..Default::default()
     });
     #[cfg(target_os = "windows")]
-    let kind = WindowKind::PopUp;
+    let kind = WindowKind::Normal;
     WindowOptions {
         kind,
         focus: true,
@@ -63,6 +66,8 @@ fn get_window_options() -> WindowOptions {
         display_id: None,
         window_bounds,
         window_decorations: None,
+        titlebar: None,
+        window_background: WindowBackgroundAppearance::Transparent,
         ..Default::default()
     }
 }
