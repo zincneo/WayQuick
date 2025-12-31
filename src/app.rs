@@ -1,10 +1,19 @@
 use gpui::*;
+use gpui_component::{Theme, ThemeRegistry};
 use smol::channel::Receiver;
 use way_quick::*;
 pub async fn run(rx: Receiver<Event>) {
     let application = Application::new().with_quit_mode(QuitMode::Explicit);
     application.run(move |app| {
         gpui_component::init(app);
+        let theme_name = SharedString::from("Catppuccin Macchiato");
+        ThemeRegistry::watch_dir(std::path::PathBuf::from("./themes"), app, move |cx| {
+            if let Some(theme) = ThemeRegistry::global(cx).themes().get(&theme_name).cloned() {
+                Theme::global_mut(cx).apply_config(&theme);
+            }
+        })
+        .unwrap();
+
         let bounds = Bounds::centered(None, size(px(800.), px(420.)), app);
         *CENTER_POINTER.lock_blocking() = Some(bounds.origin);
         app.on_window_closed(on_closed).detach();
@@ -36,15 +45,15 @@ fn on_closed(app: &mut App) {
     let launcher_window_id = if launcher_window_handle.is_some() {
         launcher_window_handle.unwrap().window_id()
     } else {
-        return ;
+        return;
     };
     if windows
         .iter()
         .filter(|window| {
-            let Some(window_handle) = window
-                .downcast::<WindowHandle<gpui_component::Root>>() else {
-                    return false;
-                };
+            let Some(window_handle) = window.downcast::<WindowHandle<gpui_component::Root>>()
+            else {
+                return false;
+            };
             launcher_window_id == window_handle.window_id()
         })
         .collect::<Vec<_>>()
