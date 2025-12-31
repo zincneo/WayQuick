@@ -32,18 +32,25 @@ async fn event_handle(app: &mut gpui::AsyncApp, rx: Receiver<Event>) {
 
 fn on_closed(app: &mut App) {
     let windows = app.windows();
+    let mut launcher_window_handle = LAUNCHER_WINDOW_HANDLE.lock_blocking();
+    let launcher_window_id = if launcher_window_handle.is_some() {
+        launcher_window_handle.unwrap().window_id()
+    } else {
+        return ;
+    };
     if windows
         .iter()
         .filter(|window| {
-            window
-                .downcast::<WindowHandle<gpui_component::Root>>()
-                .is_none()
+            let Some(window_handle) = window
+                .downcast::<WindowHandle<gpui_component::Root>>() else {
+                    return false;
+                };
+            launcher_window_id == window_handle.window_id()
         })
         .collect::<Vec<_>>()
         .len()
         == 0
     {
-        let mut launcher_window_handle = LAUNCHER_WINDOW_HANDLE.lock_blocking();
         *launcher_window_handle = None;
         std::mem::drop(launcher_window_handle);
     }
